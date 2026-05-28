@@ -1,5 +1,13 @@
-export const uploadMeeting = async (req, res) => {
+import { transcribeAudio } from "../services/transcription/groq.service.js";
+
+import { analyzeMeetingTranscript } from "../services/ai/gemini.service.js";
+
+export const uploadMeeting = async (
+  req,
+  res
+) => {
   try {
+    // Check file
     if (!req.file) {
       return res.status(400).json({
         success: false,
@@ -7,14 +15,30 @@ export const uploadMeeting = async (req, res) => {
       });
     }
 
+    console.log(req.file);
+
+    // STEP 1 → Speech-to-text
+    const transcript =
+      await transcribeAudio(req.file.path);
+
+    console.log(
+      "Transcript:",
+      transcript
+    );
+
+    // STEP 2 → Gemini analysis
+    const analysis =
+      await analyzeMeetingTranscript(
+        transcript
+      );
+
+    // FINAL RESPONSE
     return res.status(200).json({
       success: true,
-      message: "Meeting uploaded successfully",
-      file: {
-        filename: req.file.filename,
-        path: req.file.path,
-        size: req.file.size,
-      },
+
+      transcript,
+
+      analysis,
     });
   } catch (error) {
     console.error(error);
@@ -22,6 +46,7 @@ export const uploadMeeting = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: "Internal server error",
+      error: error.message,
     });
   }
 };
