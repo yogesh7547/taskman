@@ -17,7 +17,8 @@
     "express": "^4.21.2",
     "form-data": "^4.0.5",
     "groq-sdk": "^1.2.1",
-    "multer": "^2.0.2"
+    "multer": "^2.0.2",
+    "nodemailer": "^8.0.9"
   },
   "devDependencies": {
     "nodemon": "^2.0.22"
